@@ -1,1 +1,6 @@
 CREATE DATABASE sales;
+
+CREATE USER airflow WITH PASSWORD 'airflow';
+GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+
+GRANT ALL ON SCHEMA public TO airflow;

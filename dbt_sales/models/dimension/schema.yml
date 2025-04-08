@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: dim_product
+    description: "Dimension table for product information"
+    columns:
+      - name: ProductId
+        description: "The primary key for this table"
+      - name: ProductName
+        description: "The name of the product"
+      - name: Brand
+        description: "The brand of the product"
+      - name: Category
+        description: "The category of the product"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - ProductId
+            - ProductName
+            - Brand
+            - Category
+
+  - name: dim_retailer
+    description: "Dimension table for retailer information"
+    columns:
+      - name: RetailerId
+        description: "The primary key for this table"
+      - name: RetailerName
+        description: "The name of the retailer"
+      - name: Channel
+        description: "The channel of the retailer (e.g., online, offline)"
+      - name: Location
+        description: "The location of the retailer"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - RetailerId
+            - RetailerName
+            - Channel
+            - Location

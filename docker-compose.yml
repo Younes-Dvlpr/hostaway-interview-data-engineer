@@ -2,10 +2,60 @@ version: '3.8'
 services:
   postgres:
     image: postgres:latest
+    container_name: postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=airflow
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
+      - ./code:/code
     ports:
       - "5432:5432"
+
+  airflow-init:
+    image: apache/airflow:2.6.3
+    container_name: airflow_init
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__WEBSERVER__SECRET_KEY: supersecretkey
+    volumes:
+      - ./airflow-requirements.txt:/airflow-requirements.txt
+    entrypoint: [ "/bin/bash", "-c", "airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com && pip install -r airflow-requirements.txt" ]
+
+  webserver:
+    image: apache/airflow:2.6.3
+    container_name: airflow_webserver
+    restart: always
+    depends_on:
+      - postgres
+      - airflow-init
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW_CONN_POSTGRES_SALES: 'postgresql://postgres:mysecretpassword@postgres:5432/sales'
+    command: webserver
+    volumes:
+      - ./code:/opt/airflow/dags
+
+  scheduler:
+    image: apache/airflow:2.6.3
+    container_name: airflow_scheduler
+    restart: always
+    depends_on:
+      - webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW_CONN_POSTGRES_SALES: 'postgresql://postgres:mysecretpassword@postgres:5432/sales'
+    command: scheduler
+    volumes:
+      - ./code:/opt/airflow/dags
+
+volumes:
+  airflow_logs:

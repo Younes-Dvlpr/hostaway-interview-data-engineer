@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: ingestion
+    database: sales
+    schema: ingestion
+    tables:
+      - name: generated_sales_data

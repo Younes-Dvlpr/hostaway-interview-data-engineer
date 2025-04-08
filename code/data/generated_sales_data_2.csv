@@ -1,0 +1,5 @@
+SaleID,ProductID,ProductName,Brand,Category,RetailerID,RetailerName,Channel,Location,Quantity,Price,Date
+1,1,Laptop,BrandA,Electronics,1,TechGear,Online,,999,4500,2024-02-22
+2,2,Coffee Maker,BrandB,Appliances,1,TechGear,Online,,777,100,2024-02-11
+9999,2,Coffee Maker,BrandB,Appliances,1,TechGear,Online,,1,100,2024-02-24
+
